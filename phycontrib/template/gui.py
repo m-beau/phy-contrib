@@ -296,6 +296,7 @@ class TemplateController(EventEmitter):
              else self._get_template_waveforms)
         v = WaveformView(waveforms=f,
                          waveforms_set=f,
+                         datadir=self.model.dir_path,
                          )
          
         # Maxime: Make sure that the set of 100 randomly picked waveforms is 
