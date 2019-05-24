@@ -237,7 +237,14 @@ class TemplateController(EventEmitter):
                                                 self.n_spikes_waveforms,
                                                 self.batch_size_waveforms,
                                                 )
-        channel_ids = self.get_best_channels(cluster_id)
+        #channel_ids=np.arange(0, 384, 1)
+        if not channel_ids.any(): # Default
+            channel_ids = self.get_best_channels(cluster_id)
+            #print('channel ids l243 of gui.py:', channel_ids)
+
+
+        #print('CHANNEL IDS SHOULD NOT GO UNTIL 384')
+        #print('channel ids l245 of gui.py:', channel_ids)
         data = self.model.get_waveforms(spike_ids, channel_ids)
         data = data - data.mean()
         return Bunch(data=data,
@@ -288,7 +295,15 @@ class TemplateController(EventEmitter):
         f = (self._get_waveforms if self.model.traces is not None
              else self._get_template_waveforms)
         v = WaveformView(waveforms=f,
+                         waveforms_set=f,
                          )
+         
+        # Maxime: Make sure that the set of 100 randomly picked waveforms is 
+        # always available to extract waveform features.
+        # v.waveforms can be either the set or the mean or the template.
+        ws = self._get_waveforms
+        v.waveforms_set = ws
+
         v = self._add_view(gui, v)
 
         v.actions.separator()
@@ -436,6 +451,7 @@ class TemplateController(EventEmitter):
         cluster_ids = self.supervisor.selected
         if len(cluster_ids) == 0:
             return
+          
         spc = self.supervisor.clustering.spikes_per_cluster
         spike_ids = spc[cluster_ids[0]]
         spike_times = m.spike_times[spike_ids]
@@ -443,6 +459,15 @@ class TemplateController(EventEmitter):
         n = len(spike_times)
         view.go_to(spike_times[(ind + delta) % n])
 
+    def _channel_zoom_in_traceview(self, view,channel=None,N=None):
+        """Jump to next or previous spike from the selected clusters."""
+        cluster_ids = self.supervisor.selected
+        if len(cluster_ids) == 0:
+            return
+        if channel is None:
+            channel=self.get_best_channel(cluster_ids[0])
+        view.channel_zoom(channel,N)
+        
     def add_trace_view(self, gui):
         m = self.model
         v = TraceView(traces=self._get_traces,
@@ -467,6 +492,10 @@ class TemplateController(EventEmitter):
 
         v.actions.separator()
 
+        @v.actions.add(alias='cz')
+        def channel_zoom_in_traceview(channel=None,N=10):
+            self._channel_zoom_in_traceview(v,channel,N)
+            
         @v.actions.add(shortcut='alt+s')
         def toggle_highlighted_spikes():
             """Toggle between showing all spikes or selected spikes."""
@@ -499,7 +528,11 @@ class TemplateController(EventEmitter):
                             bin_size=bin_size,
                             window_size=window_size,
                             )
-
+      
+        self.acgw_mb=window_size
+        self.acgb_mb=bin_size
+        return self.acg_mb
+      
     def add_correlogram_view(self, gui):
         m = self.model
         v = CorrelogramView(correlograms=self._get_correlograms,
