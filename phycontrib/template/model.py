@@ -1,4 +1,3 @@
-
 import csv
 import glob
 import logging
@@ -54,6 +53,10 @@ def load_metadata(filename):
     return field_name, dic
 
 
+  
+  
+  
+  
 def save_metadata(filename, field_name, metadata):
     """Save metadata in a CSV file."""
     import sys
@@ -176,6 +179,9 @@ class TemplateModel(object):
                     if dat_path else os.getcwd())
         self.dat_path = dat_path
         self.dir_path = dir_path
+        
+        
+        
         self.__dict__.update(kwargs)
 
         self.dtype = getattr(self, 'dtype', np.int16)
@@ -187,6 +193,7 @@ class TemplateModel(object):
 
         self._load_data()
         self.waveform_loader = self._create_waveform_loader()
+        self.n_channels_MAXIME = 16
 
     def describe(self):
         def _print(name, value):
@@ -230,8 +237,7 @@ class TemplateModel(object):
         self.channel_positions = self._load_channel_positions()
         assert self.channel_positions.shape == (nc, 2)
 
-        self.channel_vertical_order = np.argsort(self.channel_positions[:, 1],
-                                                 kind='mergesort')
+        self.channel_vertical_order = np.argsort(self.channel_positions[:, 1],kind='mergesort')
 
         # Templates.
         self.sparse_templates = self._load_templates()
@@ -316,6 +322,7 @@ class TemplateModel(object):
             logger.debug("Load `{}`.".format(filename))
             field_name, values = load_metadata(filename)
             metadata[field_name] = values
+            
         return metadata
 
     @property
