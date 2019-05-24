@@ -230,7 +230,7 @@ class TemplateController(EventEmitter):
     # Waveforms
     # -------------------------------------------------------------------------
 
-    def _get_waveforms(self, cluster_id):
+    def _get_waveforms(self, cluster_id, channel_ids=np.zeros(1)):
         """Return a selection of waveforms for a cluster."""
         pos = self.model.channel_positions
         spike_ids = self.selector.select_spikes([cluster_id],
