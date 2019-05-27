@@ -525,7 +525,7 @@ class TemplateModel(object):
         best_channel = np.argmax(amplitude)
         channel_ids = get_closest_channels(self.channel_positions,
                                            best_channel,
-                                           self.n_closest_channels)
+                                           self.n_channels_MAXIME)#self.n_closest_channels)
         template = template[:, channel_ids]
         assert template.ndim == 2
         assert template.shape[1] == channel_ids.shape[0]
