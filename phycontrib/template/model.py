@@ -171,7 +171,7 @@ def from_sparse(data, cols, channel_ids):
 
 
 class TemplateModel(object):
-    n_closest_channels = 16
+    n_closest_channels = 32
 
     def __init__(self, dat_path=None, **kwargs):
         dat_path = dat_path or ''
@@ -193,7 +193,7 @@ class TemplateModel(object):
 
         self._load_data()
         self.waveform_loader = self._create_waveform_loader()
-        self.n_channels_MAXIME = 16
+        self.n_channels_MAXIME = 32
 
     def describe(self):
         def _print(name, value):
